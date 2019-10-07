@@ -1,0 +1,16 @@
+
+$$ Macro comment
+
+$Hello macro defined here \
+        and more \
+
+Hello1 $Hello$ \
+Hello2 spaces      here
+Hello3 \
+ Hello4 \
+Hello5 \
+
+
+
+
+

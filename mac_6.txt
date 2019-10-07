@@ -1,0 +1,12 @@
+$$ Recursive expansion
+$$
+$include macros.txt
+$$
+$$ $Hello3 Original Macro
+$$ $Hello2 original $Hello3$ macro
+$Hello This is a macro with another one $Hello2$ embedded here
+$$
+Hello1
+2222 $Hello$ 3333
+Hello2
+$$
