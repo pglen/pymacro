@@ -1,5 +1,6 @@
-Parsing examples/main.py
 #!/usr/bin/env python
+
+# $!full
 
 import os, sys, string, argparse
 
@@ -7,6 +8,7 @@ import os, sys, string, argparse
  Macro expansions.
 
 '''
+
 
  # Globals
 
@@ -271,7 +273,10 @@ argparser.add_argument( '-i',  '--showinput',
 argparser.add_argument( 'infile')
 argparser.add_argument( 'outfile', nargs='?')
 
-# Start of program:
+# End of # $!full
+
+
+# Start of program: $!main
 
 if __name__ == '__main__':
 
@@ -304,4 +309,7 @@ if __name__ == '__main__':
 
     #print()
 
+
 # EOF
+# $!main
+

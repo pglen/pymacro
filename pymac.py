@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
-from __future__ import print_function
+import os, sys, string, argparse
 
-#import sys
-#!/usr/bin/python
+'''
+ Macro expansions.
 
-import os, sys, string
-from datetime import date
+'''
+
+ # Globals
 
 seeninc = []
 seenmac = []
@@ -18,8 +18,10 @@ multibod = ""
 subnum = 0
 
 def emptysplit(strx, delim = " "):
-    arr = []; cumm = ""
 
+    ''' Split str on single delimiter '''
+
+    arr = []; cumm = ""
     for aa in range(len(strx)):
         cumm += strx[aa];
         if strx[aa] == delim:
@@ -30,55 +32,74 @@ def emptysplit(strx, delim = " "):
     if cumm != "":
         arr.append(cumm)
 
-    #print("arr", arr);
+    if args.debug > 6:
+        print("emptysplit", "'" + strx +"'", "--", arr);
     return arr
+
+currline = {}
+currfile = []
 
 #print("Python Macros running on ", sys.version);
 
-def  expand(lll, fff, outfp):
+def  expand(lll, fff):
 
     global multi, multibod, subnum
 
     mac = "";  inmac = "";  lll2 = ""
 
+    if args.debug > 5:
+        print("expanding", "{" + lll + "'}")
+
+    # In multi macro save text or eval end
     if multi != "":
         if multi in lll:
+            offs = lll.find(multi)
+            # Add last partial
+            multibod += lll[:offs]
             # Erase last NL
             multibod = multibod[:-1]
+            if args.verbose:
+                print ("\nmultibod:", "[" + multibod + "]")
+
             seenmac.append(multi)
             seenbod.append(multibod)
             multi = ""; multibod = ""
         else:
             multibod += lll + "\n"
-            #print ("multibod", multibod)
-        return ""
-
-    #print("expanding", "'" + lll + "'")
+        return None
 
     for aa in emptysplit(lll):
-        #print(" www", aa)
+        #print(" part", "'" + aa + "'")
         cc = str.strip(aa)
         if inmac == "" and multi == "":
             if len(cc) > 2 and cc[0] == "$" and cc[-1:] == "$":
-                xxx = 0
+                found = 0
                 for bb in range(len(seenmac)):
                     if seenmac[bb] == cc[:-1]:
-                        #print("Expanding macro:", seenmac[bb], "bod:", seenbod[bb])
+                        if args.verbose:
+                            print("\nExpanding macro:", seenmac[bb], "bod:", seenbod[bb])
                         lll2 += seenbod[bb] + " "
                         subnum += 1
-                        xxx = 1
-                if xxx == 0:
-                    print("Unknown Macro:", aa, file=sys.stderr)
+                        found = True
+                if not found:
+                    print("Warning: Unknown Macro in", "file:",  fff,
+                                "Line:", currline[fff], aa, file=sys.stderr)
                     lll2 += aa
             elif len(cc) > 2 and cc[:2] == "$!":
-                #print("Multiline Macro definition", aa)
+                if args.verbose:
+                    print("Multiline Macro definition", aa)
                 multi = cc
             elif len(cc) > 2 and cc[0] == "$":
-                #print("Macro definition", aa)
+                if args.verbose:
+                    print("Macro definition", cc, end = " ")
                 inmac = cc
             else:
+                if args.debug > 2:
+                    print("leftover:", aa)
                 lll2 += aa
         else:
+            if args.verbose:
+                print("mac:", "'" + aa + "'", end = " " )
             mac += aa
 
     # This line had a macro:
@@ -86,42 +107,93 @@ def  expand(lll, fff, outfp):
         #print ("Macro:", inmac, "Body:", mac)
         # Special macros
         if inmac == "$include":
-            #print("Include macro")
             macfile = str.strip(mac)
+            if args.verbose:
+                print("Include macro", macfile)
             if macfile in seeninc:
-                print("Warning: in", fff,
-                            "Recursion to same file ignored:", "'" + macfile + "'", file=sys.stderr)
+                print("Warning: in", fff,  "line:", currline[fff],
+                    "Recursion to same file ignored:", "'" + macfile + "'", file=sys.stderr)
             else:
-                seeninc.append(macfile)
-                parse(macfile, outfp)
+                ret =  parseincfile(macfile, outfp)
+                if not ret:
+                    print("Warning: in", fff, "line:", currline[fff],
+                    "No macro file:", "'" + macfile + "'", file=sys.stderr)
         else:
             if inmac in seenmac:
-                print ("Warning: in", fff, "macro defined already:", "'"+inmac+"'", file=sys.stderr)
+                print ("Warning: in", fff, "line:", currline[fff], "macro ignored, defined already",
+                                                        "'" + inmac + "'", file=sys.stderr)
             else:
                 seenmac.append(inmac)
                 seenbod.append(mac)
-    # This line had a multi line macro:
-    elif multi != "":
-        pass
-    else:
-        #print("lll2:", lll2)
-        if lll2[:-1] != "\n":
-            lll2 += "\n"
+        lll2 = None
 
-    #print ("parsed:", "'" + lll2 + "'")
+    # This line had a multi line macro:
+    if multi != "":
+        # Single line multi
+        offs = lll.find(multi) + len(multi) + 1
+        part = lll[offs:]
+        #print("Singline part:", part)
+        if multi in part:
+            offs2 = part.find(multi) + offs - 1
+            # Add last partial
+            #print("Singline multi:'%s'" %lll[offs:offs2])
+            multibod += lll[offs:offs2]
+            if args.verbose:
+                print ("\nmultibod:", "[" + multibod + "]")
+            seenmac.append(multi)
+            seenbod.append(multibod)
+            multi = ""; multibod = ""
+        else:
+            # Add fist partial
+            if not multibod:
+                offs = lll.find(multi) + len(multi) + 1
+                multibod += lll[offs:]
+                return None
+        return None
+
+    if args.debug > 4:
+        print ("parsed:", "'" + lll2 + "'")
     return lll2
 
-def parse(nnn, outfp):
+def parseincfile(macfile, outfp):
 
-    global subnum ;
-    xstr = ""
+    # Scan possible locations
+
+    # 1.) dir of the source file
+    ppp = os.path.dirname(args.infile)
+    fff = os.path.join(ppp, macfile)
+    #print("fff", fff)
+    if os.path.isfile(fff):
+        seeninc.append(fff)
+        parsefile(fff, outfp)
+        return True
+
+    # 2.) current dir
+    if os.path.isfile(macfile):
+        seeninc.append(macfile)
+        parsefile(macfile, outfp)
+        return True
+
+    # No file
+    return False
+
+def parsefile(nnn, outfp):
+
+    global subnum, currline, currfile;
+
+    currfile.append(nnn)
     #print ("Parsing", nnn)
-    fpi = open(nnn, "r")
 
+    xstr = ""
+    fpi = open(nnn, "r")
     addnext = "";
     for aaa in fpi:
-        #if 1 or aaa != "\n":
-        bbb = string.replace(aaa, "\n", "")
+        try:
+            currline[nnn] += 1
+        except:
+            currline[nnn] = 1
+
+        bbb = str.replace(aaa, "\n", "")
 
         # Comment
         if str.strip(bbb)[:2] == "$$":
@@ -130,43 +202,105 @@ def parse(nnn, outfp):
 
         if str.endswith(bbb, "\\"):
             addnext += bbb[:-1]
-            #print("line ext")
         else:
             if addnext != "":
                 bbb = addnext + bbb
+                #print("line ext:", bbb)
                 addnext = ""
-            xstr += expand (bbb, nnn, outfp)
 
-    # Left over
+            if args.showinput:
+                print("Input: [", bbb, "]")
+
+            zstr = expand(bbb, nnn)
+            #print("zstr:", zstr)
+            if args.showinput:
+                print("Output: [", zstr, "]")
+            if zstr != None:
+                if xstr:
+                    xstr += "\n"
+                xstr += zstr
+
+    # Left over without line continuation
     if addnext != "":
-        xstr += expand (addnext, nnn, outfp)
+        #print("Continuation", addnext)
+        zstr = expand (addnext, nnn)
+        if zstr != None:
+            if xstr:
+                xstr += "\n"
+            xstr += zstr
 
     # Loop until all items are expanded
-    while(1):
-        subnum = 0;
-        xstr =  expand (xstr, nnn, outfp)
-        if subnum == 0:
-            break
 
-    #print ("xstr", xstr);
-    print("%s" % xstr, file=outfp)
+    cnt = 0  # Thinking 6 deep is enough
 
+    if xstr != None:
+        while(1):
+            #break
+            cnt += 1
+            xstr2 = xstr[:]
+            #print(nnn, "subnum", cnt, xstr)
+            xstr3 =  expand (xstr2, nnn)
+            if xstr3 == None:
+                break
+            xstr = xstr3
+            if xstr2 == xstr:
+                #print("No change")
+                break
+            if cnt > 6:
+                break
+
+        #print ("xstr", xstr);
+        if xstr:
+            print("%s" % xstr, file=outfp)
+
+argparser = argparse.ArgumentParser(description='Macro processor')
+
+argparser.add_argument( '-v',  '--verbose',
+    action="store_true",
+    help='show operational details')
+
+argparser.add_argument( '-d',  '--debug',
+    action="store", type=int, default=0,
+    help='debug level')
+
+argparser.add_argument( '-i',  '--showinput',
+    action="store_true",
+    help='show input fileo')
+
+argparser.add_argument( 'infile')
+argparser.add_argument( 'outfile', nargs='?')
 
 # Start of program:
 
 if __name__ == '__main__':
 
-    outfp = sys.stdout
+    global args
+    args = argparser.parse_args()
+    if args.debug > 5:
+        print (args)
 
-    if len(sys.argv) > 2:
+    if len(sys.argv) < 2:
+        print("use: pymac.py infile")
+        sys.exit(0)
+
+    if args.outfile:
+        if args.infile == args.outfile:
+            print("Cannot use the same file as in / out")
+            sys.exit(1)
+
+    if args.outfile:
         outfp = open(sys.argv[2], "w")
+    else:
+        outfp = sys.stdout
 
-    parse(sys.argv[1], outfp)
+    parsefile(args.infile, outfp)
 
     # Diagnostics: print macros
-    for aa in range(len(seenmac)):
-        print(seenmac[aa], " = " , seenbod[aa])
+    if args.debug > 4:
+        print("Dumping macros:")
+        for aa in range(len(seenmac)):
+            print("Macro:", seenmac[aa], " = " , seenbod[aa])
 
     #print()
 
-
+# EOF

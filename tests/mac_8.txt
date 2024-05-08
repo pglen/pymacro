@@ -1,0 +1,5 @@
+Begin
+$org "Original Macro"
+$!mult "Multiline macro with another $org$ on single line" $!mult
+$!mult$
+End

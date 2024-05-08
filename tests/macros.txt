@@ -1,0 +1,14 @@
+$$ Recursive expansion
+$Hello Original Macro
+$Hello2 Second macro
+$Hello3 Third macro $Hello2$
+$Hello4 This is a macro where another macro is $Hello3$ embedded.
+$$Hello5 This is a macro with faulty recursion $Hello5$
+$$
+$$Hello2 second macro redefined
+$Hello2a  macro2 defined here
+$Hello_again3  macro3 defined here
+$$
+$$ The following is output verbatim:
+String from Include: Hello2 Hello3 \
+Hello4 Hello5

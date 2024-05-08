@@ -1,0 +1,14 @@
+$$ Multi line macro
+Begin
+$hello 'hello macro'
+$!Hello This will expand until matching macro terminator
+multi line 1
+multiline 2 recursive $hello$ test
+multi line 3 line cont \
+End multi $!Hello
+after multi def
+$!Hello$
+$hello$
+$!hello2 Hello multiline one line test $!hello2
+$!hello2$
+End

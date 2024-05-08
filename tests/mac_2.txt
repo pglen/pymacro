@@ -1,0 +1,6 @@
+$$ Macro comment
+$Hello Macro 'defined' here  and  more
+$$ More comment
+Hello1 "Quoted str"
+$Hello$
+Hello2

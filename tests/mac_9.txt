@@ -1,0 +1,16 @@
+Begin
+$org "Original Macro"
+$!mult
+"Multiline macro embedded in another $org$ on single line"
+q
+$!mult
+Mult def Ended
+$!full
+Full Macro
+"Full macro embedded in another $org$ on single line"
+w
+$!full
+Full def Ended
+$!mult$
+$!full$
+End

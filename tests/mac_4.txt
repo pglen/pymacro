@@ -1,0 +1,11 @@
+$$ Macro comment
+Begin
+$!Hello multiline macro defined here
+line 2 of multi line
+line 3 of multi line $!Hello
+$!Hello$
+Hello2 -  - spaces here
+Hello3 \
+Hello4 \
+Hello5
+End
