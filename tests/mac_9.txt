@@ -1,16 +1,9 @@
+$# No spaces required
 Begin
-$org "Original Macro"
-$!mult
-"Multiline macro embedded in another $org$ on single line"
-q
-$!mult
-Mult def Ended
-$!full
-Full Macro
-"Full macro embedded in another $org$ on single line"
-w
-$!full
-Full def Ended
-$!mult$
-$!full$
+$$org$$"Original_Name"@@ @@
+$$name$$
+"Full macro embedded in another %%org%% on single line"
+"Full2 macro embedded in another %%org%% on single line"
+@@ @@
+%%name%%
 End

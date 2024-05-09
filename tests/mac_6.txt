@@ -1,7 +1,8 @@
-$$ Recursive expansion
+$# Recursive expansion
 Start
-$Hello3 Original Macro
-$Hello2 Embedding $Hello3$
-$Hello "Macro with another one $Hello2$ embedded here"
-Beg $Hello$ End
+$$Hello2$$ Embedding 2 %%Hello3%% @@Hello2@@
+$$Hello3$$ Original Macro 3 @@Hello3@@
+$$Hello$$ "Macro with another one %%Hello2%% embedded here" @@Hello@@
+Beg
+%%Hello%%
 End

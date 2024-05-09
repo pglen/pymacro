@@ -1,9 +1,9 @@
-$$ test backslash expansion
+$# test backslash expansion
 Hello
+
+e (blank above)
 Hello1 \
-Hello2
-Hello3 \
-Hello4 \
-- Hello5
-$$ Backslash at the end of file:
+Hello2 \$\$ and backslash \\ char
+Hello3 control $ char
+$# Backslash at the end of file:
 Left over \

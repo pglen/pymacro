@@ -1,4 +1,4 @@
 Begin
-$org "Original Macro"
-This is a macro with another $org$ macro embedded here
+$$org$$ "Original Macro" @@ @@
+This is a text with a  %%org%% embedded here.
 End

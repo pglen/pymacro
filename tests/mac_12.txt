@@ -1,0 +1,13 @@
+$# Macro comment
+Begin
+$$mac$$ Hello Macro @@mac@@
+mac beg
+%%mac%%
+mac end
+$$Hello$$
+Macro2 'To include macro %%mac%%
+@@Hello@@
+hello beg
+%%Hello%%
+hello end
+End

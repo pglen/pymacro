@@ -9,7 +9,6 @@ import os, sys, string, argparse
 
 '''
 
-
  # Globals
 
 seeninc = []
@@ -273,43 +272,43 @@ argparser.add_argument( '-i',  '--showinput',
 argparser.add_argument( 'infile')
 argparser.add_argument( 'outfile', nargs='?')
 
-# End of # $!full
+# End of  $!full
 
-
-# Start of program: $!main
+# $!main
+# Start of program:
 
 if __name__ == '__main__':
+
+$!progname$
 
     global args
     args = argparser.parse_args()
     if args.debug > 5:
         print (args)
-
     if len(sys.argv) < 2:
-        print("use: pymac.py infile")
+        print("use: $name$ infile")
         sys.exit(0)
-
     if args.outfile:
         if args.infile == args.outfile:
             print("Cannot use the same file as in / out")
             sys.exit(1)
+    # $!main
 
+    # $!main2
     if args.outfile:
         outfp = open(sys.argv[2], "w")
     else:
         outfp = sys.stdout
-
     parsefile(args.infile, outfp)
-
     # Diagnostics: print macros
     if args.debug > 4:
         print("Dumping macros:")
         for aa in range(len(seenmac)):
             print("Macro:", seenmac[aa], " = " , seenbod[aa])
 
+    # $!main2
+
     #print()
 
-
 # EOF
-# $!main
 

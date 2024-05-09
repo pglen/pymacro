@@ -1,3 +1,18 @@
 $include main.py
 
+$$! full$
+
+$name pymac
+$!progname
+here
+progname = "Program Name"
+hello
+again
+
+$!progname
+
+# Main 1
+$!main$
+# Main 2
+$$!main2$
 

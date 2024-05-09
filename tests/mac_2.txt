@@ -1,6 +1,19 @@
-$$ Macro comment
-$Hello Macro 'defined' here  and  more
-$$ More comment
+$# Macro comment
+Begin
+$$Hello$$ Macro 'defined' here  and  more @@Hello@@
 Hello1 "Quoted str"
-$Hello$
-Hello2
+hello beg
+%%Hello%%
+hello end
+$$Hello2$$
+Macro2 'To include control chars,
+a second line with macro with  % %Hello% %  in it
+third line
+escape with backslash (\\)
+the dollar $ char and escaped double \$\$
+hello
+@@Hello2@@
+hello2 beg
+ %%Hello2%%
+hello2 end
+End
