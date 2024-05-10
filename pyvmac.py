@@ -513,8 +513,10 @@ argparser.add_argument( '-n',  '--norecurse',
     action="store_true",
     help='Do not recurse. Flat expansion.')
 
-argparser.add_argument( 'infile')
-argparser.add_argument( 'outfile', nargs='?')
+argparser.add_argument( 'infile',
+    help="The main macro file")
+argparser.add_argument( 'outfile', nargs='?',
+    help="Using stdout if omitted")
 
 #print("Python Macros running on ", sys.version);
 

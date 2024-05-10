@@ -35,3 +35,10 @@ git: clean
 	git push
 #	git push local
 
+git2:
+	@$(eval AAA=$(shell zenity --entry --text "Enter Git Commit Message:"))
+	git add .
+	git commit -m "${AAA}"
+	git push
+
+# EOF
