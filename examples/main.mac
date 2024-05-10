@@ -1,14 +1,8 @@
 $$include$$ main.inc @@include@@
-$$include$$ allmain.inc @@include@@
-
-$$progname$$
-prog="Program Name"
+$$progname$$ prog="Program Name"
 @@progname@@
-
-$$code$$
-# Adding Code:
+$$code$$# Adding Code:
 aa = 0
 @@code@@
 %%xprologue%%
 %%xmain%%
-# End

@@ -473,7 +473,7 @@ The strings '$#' '#$' '//#' at the beginning of the line act as comments.
 argparser = argparse.ArgumentParser(description=desc)
 
 argparser.add_argument( '-v',  '--verbose',
-    action="count",
+    action="count", default=0,
     help='Show operational details. -vv more for output')
 
 argparser.add_argument( '-d',  '--deb',
