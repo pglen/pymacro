@@ -1,4 +1,4 @@
-# pymacro
+# PyMacro
 
 ## This is a simple macro processor.
 
@@ -57,7 +57,7 @@ The defined macros then referenced by name and a leading / trailing '%%' sign.
      The above macro will be substituted below:
      %%hello%%
 
-All other text, except macro comments are propagated verbatim.
+ his is a quick hack, please do not expect professional quality. However
 
 ## Macro Comments:
 
@@ -68,7 +68,7 @@ Those lines are completely ignored and not propagated to the output.
 
 The special macro / command will read a macro file into the current context.
 
-    $$include$$
+    $$include$$ includefilename @@include@@
 
 The include files do not contribute directly to the output, they define macros
 for the main file to expand. This is to allow raw files to be annotated without
@@ -77,45 +77,51 @@ generating clutter.
 The Include search path:
 
  * Path of the source file,
- * Current directory
- * User's macro path. (~/pymacros).
+ * Current directory,
+ * User's macro path (~/pymacros).
 
 ## Misc:
 
-Warnings are issued :
+PyMacro is case senstive.
 
- * if a macro is not defined,
- * the macro had duplicate definition,
- * the macro is not terminated with the same name (except the empty terminator)
- * include file cannot be found.
-
-All the command prefixes / suffixed can be escaped with a backslash to
+All the commands prefixes / suffixes can be escaped with a backslash to
 loose their special meaning.
 
-The indentation of the macro is preserved. The indentation in the target
-file is determined by the indentation of the expansion, added to the
-indentation of the macro definition.. In short, it will do the
-right thing for python code.
+Warnings are issued to stderr, if a:
 
-  Recursive expansion. Up to six level of recursion is expanded. Make sure that there
+ * Macro was referenced, but not defined,
+ * Macro replaced by a duplicate definition,
+ * Macro is not terminated with the same name (except the empty terminator),
+ * Include file is not found.
+
+The indentation of the macro and its definiton are preserved. The indentation
+in the target file is determined by the indentation of the expansion, added to the
+indentation of the macro definition. In short, it will do the right thing for
+python code.
+
+Recursive expansion. Up to six level of recursion is expanded. Make sure that there
 are no self referencing macros like:
 
-       $$recurse$$ This macro will $$recurse$$ into itself
+      $$recurse$$ This macro will $$recurse$$ into itself
 
-  The recursive macro will print many copies (6) into the output. It is not planned to
-catch recursion any time soon.
+The recursive macro will print many copies (6) into the output. It is not planned to
+catch self recursion any time soon.
 
-This is a quick hack, please do not expect much here. However this utility is a
+Preseved spaces. The delimiter is the absolute limit for the macro name / body. The
+whitespce within space is preserved.
+
+    $$macro$$ is different from $$ macro $$
+
+ This is a quick hack, please do not expect much here. However this utility is a
 life saver for coding.
 
 ## Example usage:
 
-  The utility will allow you to refer to code tie a simple macro. For instance the
+  The utility will allow you to refer to code with a simple macro. For instance the
 following code in an include file pulled in to the current context:
 
     $$include$$ main.inc @@include@@
-    $$progname$$ prog="Program Name"
-    @@progname@@
+    $$progname$$ prog="Program Name" @@progname@@
     $$code$$# Adding Code:
     aa = 0
     @@code@@
