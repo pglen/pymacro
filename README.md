@@ -6,9 +6,9 @@
 
  Will expand macros into outfile or stdout
 
-A macro is defined with a '\$\$' enclosed sting. [Like: \$\$macro\$\$]
+A macro is defined with a '\$\$' enclosed sting. [Like: \\$\\$ name \\$\\$]
 The macro body is defined after that, terminated by a '@@' enclosed
-string. [like: @@macro@@] The empty terminator '@@ @@' can be used as a convenience;
+string. [like: @name@@] The empty terminator '@@ @@' can be used as a convenience;
 
 
 All the command prefixes / suffixed can be escaped with a backslash to
@@ -18,7 +18,7 @@ The macro is expanded by a '%%' enclosed string. (like: %%macro%%).
 
 Here is a complete example macro with expansion:
 
-    \$\$mac\$\$ Hello @@mac@@
+    $$mac$$ Hello @@mac@@
     %%mac%%.
 
 ## Include search path:
@@ -36,7 +36,7 @@ The defined macros then referenced by name and a leading / trailing '$%%' sign.
 
 ### Examples:
 
-     \$\$hello\$\$ This is a macro. @@hello@@
+     $$hello$$ This is a macro. @@hello@@
 
      The above macro will be substituted here:
      %%hello%%
@@ -56,7 +56,7 @@ Warnings are issued :
   Recursive expansion. Up to six level of recursion is expanded. Make sure that there
 are no self referencing macros like:
 
-       \$\$recurse\$\$ This macro will \$\$recurse\$\$ into itself
+       $$recurse$$ This macro will $$recurse$$ into itself
 
   The recursive macro will print many copies (6) into the output. It is not planned to
 catch recursion any time soon.
@@ -69,8 +69,8 @@ life saver for coding.
   The utility will allow you to refer to code tie a simple macro. For instance the
 following code in an include file pulled in to the current context:
 
-    \$\$include\$\$ main.inc @@include@@
-    \$\$progname$$ prog="Program Name"
+    $$include$$ main.inc @@include@@
+    $$progname$$ prog="Program Name"
     @@progname@@
     $$code$$# Adding Code:
     aa = 0
