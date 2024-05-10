@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-import os, sys, string, argparse
-import stack
+import os, sys, argparse
 
-'''
+# pylint: disable=C0410
+# pylint: disable=C0209
+# pylint: disable=C0103
+# pylint: disable=C0321
+# pylint: disable=C0410
+__doc__ = '''
 Macro expansions. I was looking at this state machine and I discovered that
 I do not have to keep several states. Provided that I create a spec that
 has unique markers for each function.
@@ -33,6 +37,8 @@ STATE_MBOD  = 2
 STATE_MEND  = 3
 STATE_EXPM  = 4
 
+args = None
+
 seeninc = []
 seenmac = []
 seenbod = []
@@ -44,10 +50,12 @@ currfile = []
 
 class States_class():
 
+    ''' State variables for the parser '''
+
     _frozen = False
 
     def __init__(self):
-        self.state = 0;
+        self.state = 0
         self.dname = [];    self.xname = []
         self.body  = [];    self.macx = []
         self.compr = [];    self.lineno = 0
@@ -85,14 +93,20 @@ def esplit(strx):
 
     prev = strx[0]                  # Pre load
     for aa in range(1, xlen):
-        ccc = strx[aa];
+        ccc = strx[aa]
         if not esc:
             if ccc == '\\':
                 esc = True
 
-            if  (ccc == delim  and prev == delim) or \
-                (ccc == delim2 and prev == delim2) or \
-                (ccc == delim3 and prev == delim3):
+            got = False
+            if  ccc == delim and prev == delim:
+                got = True
+            if  ccc == delim2 and prev == delim2:
+                got = True
+            if ccc == delim3 and prev == delim3:
+                got = True
+
+            if got:
                 if cumm:
                     arr.append(cumm[:-1])
 
@@ -105,7 +119,6 @@ def esplit(strx):
         else:
             cumm += ccc
             esc = False
-            pass
         prev = ccc
 
     # Left over field with no separator:
@@ -114,28 +127,32 @@ def esplit(strx):
         arr.append(cumm)
 
     if args.deb > 8:
-        print("esplit", "[{" + strx +"}]", "--", arr);
+        print("esplit", "[{" + strx +"}]", "--", arr)
     return arr
 
 def is_macro(macname):
 
-    for bb in range(len(seenmac)):
-        if seenmac[bb] == macname:
+    ''' determine if there is a macro '''
+
+    for bb, cc in enumerate(seenmac):
+        if cc == macname:
             return bb
     return -1
 
 def lookup_macro(macname, indent = 0):
 
+    ''' return expanded macro string '''
+
     #print("lookup_macro()", macname, indent)
 
     lll2 = ""
     found = 0
-    for bb in range(len(seenmac)):
+    for bb, cc in enumerate(seenmac):
 
         #print("dump mac:",  seenmac[bb])
         #print("dump body:", seenbod[bb])
 
-        if seenmac[bb] == macname:
+        if cc == macname:
             found = True
             #if args.verbose:
             #    print("\nexpand_lineing macro:", seenmac[bb],
@@ -155,20 +172,21 @@ def lookup_macro(macname, indent = 0):
                 file=sys.stderr)
     return lll2
 
-def  expand_line(lll, fff):
+def  expand_line(lll, fff, outfpx):
+
+    ''' This is where it is all happaning '''
 
     if args.deb > 7:
         print("expand_line", "{" + lll + "'}")
 
-    #print("line:", lll)
-
     States.lineno += 1
+
     # Short curcuit: Blank line:
-    if not len(lll):
+    if not lll:
         return ""
 
-    cnt = 0
-    lll2 = ""; expos = 0;  pos = 0
+    cnt = 0;  lll2 = ""; expos = 0;  pos = 0
+
     larr = esplit(lll)
     #print("larr", larr)
     for aa in larr:
@@ -232,13 +250,13 @@ def  expand_line(lll, fff):
 
                 # Unify lines:
                 uni = {}; body = []
-                for aaa in range(len(States.body)):
+                for aaa, bbb in enumerate(States.body):
                     linex = States.lines[aaa]
                     try:
-                        uni[linex] += States.body[aaa]
+                        uni[linex] += bbb
                     except:
                         uni[linex] = ""
-                        uni[linex] += States.body[aaa]
+                        uni[linex] += bbb
                 #print("uni", uni)
                 for bb in uni.keys():
                     body.append(uni[bb])
@@ -252,7 +270,7 @@ def  expand_line(lll, fff):
                 #print("Closure bod:", States.dname[0])
 
                 # only if there is closure name
-                if len(States.dname) and States.dname[0].strip():
+                if States.dname and States.dname[0].strip():
                     if States.macx[0] != States.dname[0]:
                         print("Warning: Invalid closure for macro: '%s'" %  States.macx[0],
                            "in file:",  fff,  "Line:", currline[fff],
@@ -263,7 +281,7 @@ def  expand_line(lll, fff):
 
                 if States.macx[0] == "include":
                     #print("SPECIAL: include", "'" + States.body[0].strip() + "'")
-                    parseincfile(States.body[0].strip(), outfp)
+                    parseincfile(States.body[0].strip(), outfpx)
                     # Restore current file
                     States.fname = fff
                 else:
@@ -300,7 +318,6 @@ def  expand_line(lll, fff):
         else:
             if 1: #args.deb > 0:
                 print("Invalid state", States.state)
-            pass
 
         pos += len(aa)
         #print("pos:", pos, "aa:", aa)
@@ -311,7 +328,7 @@ def  expand_line(lll, fff):
 
     return lll2
 
-def parseincfile(macfile, outfp):
+def parseincfile(macfile, outfpx):
 
     # Reset parser
     States.macx[0] = "" # Kill macro name, prevent recursion
@@ -331,7 +348,7 @@ def parseincfile(macfile, outfp):
         seeninc.append(fff)
         if args.verbose:
             print("Including:  '%s'" % fff)
-        parsefile(fff, outfp, True)
+        parsefile(fff, outfpx, True)
 
         return True
 
@@ -340,7 +357,7 @@ def parseincfile(macfile, outfp):
         seeninc.append(macfile)
         if args.verbose:
             print("Including:  '%s'" % macfile)
-        parsefile(macfile, outfp, True)
+        parsefile(macfile, outfpx, True)
         return True
 
     # 3.) user macro dir
@@ -351,7 +368,7 @@ def parseincfile(macfile, outfp):
         seeninc.append(fff)
         if args.verbose:
             print("Including:  '%s'" % fff)
-        parsefile(fff, outfp, True)
+        parsefile(fff, outfpx, True)
         return True
 
     print("Warning: Could not open include: '%s'" % macfile,
@@ -361,23 +378,27 @@ def parseincfile(macfile, outfp):
 
 def add_line(zstr, xstr):
 
-    if zstr != None:
+    ''' Add a line '''
+
+    if not zstr is None:
         padd = ""
         if xstr:
             padd = "\n"
         xstr += padd + zstr
     return xstr
 
-def parsefile(nnn, outfp, inc=False):
+def parsefile(nnn, outfpx, inc=False):
 
-    global currline, currfile;
+    ''' Handle one file '''
+
+    global currline, currfile
 
     currfile.append(nnn)
     States.fname = nnn
     #print ("Parsing", nnn)
 
     fpi = open(nnn, "r")
-    xstr = "";  addnext = "";
+    xstr = "";  addnext = ""
     for aaa in fpi:
         try:
             currline[nnn] += 1
@@ -386,7 +407,7 @@ def parsefile(nnn, outfp, inc=False):
 
         bbb = str.replace(aaa, "\n", "")
 
-        if currline[nnn] <= args.skip and inc==False:
+        if currline[nnn] <= args.skip and inc is False:
             if args.deb > 3:
                 print("Skipping:", nnn, currline[nnn], bbb)
             continue
@@ -415,7 +436,7 @@ def parsefile(nnn, outfp, inc=False):
             if args.showinput:
                 print("Input: [", bbb, "]")
 
-            zstr = expand_line(bbb, nnn)
+            zstr = expand_line(bbb, nnn, outfpx)
             #print("zstr:", zstr)
             if args.showinput:
                 print("Output: [", zstr, "]")
@@ -424,26 +445,26 @@ def parsefile(nnn, outfp, inc=False):
     # Left over without line continuation
     if addnext != "":
         #print("Continuation", addnext)
-        zstr = expand_line (addnext, nnn)
+        zstr = expand_line (addnext, nnn, outfpx)
         xstr = add_line(zstr, xstr)
 
     # Loop until all items are expand_lineed
 
     cnt = 0  # Thinking 6 deep is enough
 
-    if xstr != None:
+    if not xstr is None:
         cnt = 0
-        while(1):
+        while True:
             if args.norecurse:
                 break
             cnt += 1
             xstr2 = xstr.split("\n")
             xstr3 = ""
-            for aa in xstr2:
-                zstr = expand_line(aa, nnn)
+            for aaa in xstr2:
+                zstr = expand_line(aaa, nnn, outfpx)
                 #print("zstr", "'" + zstr + "'")
                 xstr3 = add_line(zstr, xstr3)
-            if xstr3 == None:
+            if xstr3 is None:
                 break
             xstr = xstr3
             if xstr2 == xstr:
@@ -459,7 +480,7 @@ def parsefile(nnn, outfp, inc=False):
 
         #print ("xstr", xstr);
         if xstr:
-            print("%s" % xstr, file=outfp)
+            print("%s" % xstr, file=outfpx)
 
 desc = '''\
 Will expand macros. A macro is defined with a '$$' enclosed sting. (Like: $$macro$$)
@@ -499,7 +520,9 @@ argparser.add_argument( 'outfile', nargs='?')
 
 # Start of program:
 
-if __name__ == '__main__':
+def mainfunct():
+
+    ''' Moved to a func so globals are avoided '''
 
     global args
 
@@ -512,6 +535,10 @@ if __name__ == '__main__':
             print("Cannot use the same file as in / out")
             sys.exit(1)
 
+    if not os.path.isfile(args.infile):
+        print("Cannot open: '%s'"  % args.infile)
+        sys.exit(0)
+
     if args.outfile:
         outfp = open(args.outfile, "w")
     else:
@@ -520,18 +547,16 @@ if __name__ == '__main__':
     if args.verbose:
         print("Processing: '%s'" % args.infile)
 
-    if not os.path.isfile(args.infile):
-        print("Cannot open: '%s'"  % args.infile)
-        sys.exit(0)
-
     parsefile(args.infile, outfp)
 
     # Diagnostics: print macros
     if args.deb > 4:
         print("Dumping macros:")
-        for aa in range(len(seenmac)):
-            print("Macro:", seenmac[aa], " = " , seenbod[aa])
+        for aaaa in range(len(seenmac)):
+            print("Macro:", seenmac[aaaa], " = " , seenbod[aaaa])
 
     #print()
 
+if __name__ == '__main__':
+    mainfunct()
 # EOF

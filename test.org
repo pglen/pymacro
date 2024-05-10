@@ -1,49 +1,59 @@
-Parsing tests/mac_1.txt
 Hello
-Hello1 Hello2
-Hello3 Hello4 - Hello5
+
+e (blank above)
+Hello1 Hello2 \$\$ and backslash \\ char
+Hello3 control $ char
 Left over 
-Parsing tests/mac_3.txt
-Parsing tests/macros.txt
-String from Include: Hello2 Hello3 Hello4 Hello5
+Warning: duplicate macro: 'Hello' in file: tests/mac_3.txt Line: 6
 Begin
-Original Macro 
-Second macro 
-Third macro Second macro 
-This is a macro where another macro is Third macro Second macro embedded. 
-Hello4 Hello5
-end
-Parsing tests/mac_5.txt
+Hello: Hello macro re defined here
+Hello2: Hello2: Multiline macro
+        Hello2: Line 2
+Hello3: Hello3: Multiline macro
+        Hello3: Line 2
+Hello4: Hello4: This is a macro with another - [Embedded] - macro in it
+end 
 Begin
 after multi def
-This will expand until matching macro terminator
-multi line 1
-multiline 2 recursive 'hello macro' test
-multi line 3 line cont End multi  
-'hello macro' 
-Hello multiline one line test 
+    hello macro
+    hello line 2 recursive 'hello2 macro'
+                           'hello2 Second line' test
+    hello line 3 line cont
+    End multi
+after multi exp
 End
-Parsing tests/mac_7.txt
+Warning: Could not open include: 'nofile' in file: tests/mac_7.txt Line: 3
 Begin
-This is a macro with another "Original Macro" macro embedded here
+
+
+This is a text with a   "Original Macro"  embedded here.
 End
-Parsing tests/mac_2.txt
+Begin
 Hello1 "Quoted str"
-Macro 'defined' here  and  more 
-Hello2
-Parsing tests/mac_4.txt
-Begin
-multiline macro defined here
-line 2 of multi line
-line 3 of multi line  
-Hello2 -  - spaces here
-Hello3 Hello4 Hello5
+hello beg
+ Macro 'defined' here  and  more 
+hello end
+hello2 beg
+ Macro2 'To include control chars,
+ a second line with macro with  % %Hello% %  in it
+ third line
+ escape with backslash (\\)
+ the dollar $ char and escaped double \$\$
+ hello
+hello2 end
 End
-Parsing tests/mac_6.txt
+Begin
+This is macro 'Act'
+
+Multiline:      multiline macro defined here
+                line 2 of multi line
+                line 3 of multi line Act again
+                line 4
+End
 Start
-Beg "Macro with another one Embedding Original Macro embedded here" End
+Beg
+ "Macro with another one  Embedding 2  Original Macro 3   embedded here" 
 End
-Parsing tests/mac_8.txt
 Begin
-"Multiline macro with another "Original Macro" on single line" 
+Embedded "Original Macro with 'Embedded Macro' with no spaces" here 
 End
