@@ -8,7 +8,8 @@
 
 A macro is defined with a '\$\$' enclosed sting. [Like: \$\$macro\$\$]
 The macro body is defined after that, terminated by a '@@' enclosed
-string. [like: @@macro@@]
+string. [like: @@macro@@] The empty terminator '@@ @@' can be used as a convenience;
+
 
 All the command prefixes / suffixed can be escaped with a backslash to
 loose their special meaning.
@@ -47,9 +48,9 @@ context.
 
 Warnings are issued :
 
- *if a macro is not defined,
- * the macro had duplicate definition.
- * the macro is not terminated with the same name (except the empth terminator)
+ * if a macro is not defined,
+ * the macro had duplicate definition,
+ * the macro is not terminated with the same name (except the empty terminator)
  * include file cannot be found.
 
   Recursive expansion. Up to six level of recursion is expanded. Make sure that there
