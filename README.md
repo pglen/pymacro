@@ -6,9 +6,12 @@
 
  Will expand macros into outfile or stdout
 
-A macro is defined with a '\$\$' enclosed sting. (Like: \$\$macro\$\$)
+A macro is defined with a '\$\$' enclosed sting. [Like: \$\$macro\$\$]
 The macro body is defined after that, terminated by a '@@' enclosed
-string. (like: @@macro@@)
+string. [like: @@macro@@]
+
+All the command prefixes / suffixed can be escaped with a backslash to
+loose their special meaning.
 
 The macro is expanded by a '%%' enclosed string. (like: %%macro%%).
 
@@ -65,8 +68,8 @@ life saver for coding.
   The utility will allow you to refer to code tie a simple macro. For instance the
 following code in an include file pulled in to the current context:
 
-    $$include$$ main.inc @@include@@
-    $$progname$$ prog="Program Name"
+    \$\$include\$\$ main.inc @@include@@
+    \$\$progname$$ prog="Program Name"
     @@progname@@
     $$code$$# Adding Code:
     aa = 0
