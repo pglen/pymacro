@@ -2,17 +2,22 @@
 
 ## This is a simple macro processor.
 
-    usage: pymac.py [-h] [-v] [-d DEBUG] [-i] infile [outfile]
+    usage: pymac.py [-h] [-v] [-d DEB] [-s SKIP] [-i] [-n] infile [outfile]
 
  Will expand macros into outfile or stdout
 
 A macro is defined with a '\$\$' enclosed sting.
+
     $$macro_name$$
+
 The macro body is defined after that, terminated by a '@@' enclosed string.
+
     @$macro_name@@
+
  The empty terminator '@@ @@' can be used as a convenience;
 
 The macro is expanded by a '%%' enclosed string.
+
      %%macro_name%%
 
 Here is a complete example macro with expansion:
@@ -21,6 +26,26 @@ Here is a complete example macro with expansion:
     %%mac%%.
 
 Will print the infamous message string.
+
+## Command arguments:
+
+    positional arguments:
+      infile
+      outfile
+
+    options:
+      -h, --help            show this help message and exit
+      -v, --verbose         Show operational details. -vv more for output
+      -d DEB, --deb DEB     Debug level (0=none 10=Noisy)
+      -s SKIP, --skip SKIP  Skip number of initial lines
+      -i, --showinput       Show input lines from file
+      -n, --norecurse       Do not go recursive. Flat expansion.
+
+Verbose prints file name as it is processed, double verbose injects the macro name
+into the target as it is expanded. For troubleshooting only.
+
+Skip lines will ignore the number of leading lines, for instance the #!/usr/bin ..
+may be skipped with this option.
 
 ## Include search path:
 
