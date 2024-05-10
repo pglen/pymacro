@@ -6,13 +6,9 @@
 
  Will expand macros into outfile or stdout
 
-A macro is defined with a '\$\$' enclosed sting. [Like: \\$\\$ name \\$\\$]
+A macro is defined with a '\$\$' enclosed sting. (like: \$\$name\$\$)
 The macro body is defined after that, terminated by a '@@' enclosed
-string. [like: @name@@] The empty terminator '@@ @@' can be used as a convenience;
-
-
-All the command prefixes / suffixed can be escaped with a backslash to
-loose their special meaning.
+string. (like: @name@@) The empty terminator '@@ @@' can be used as a convenience;
 
 The macro is expanded by a '%%' enclosed string. (like: %%macro%%).
 
@@ -32,13 +28,12 @@ Here is a complete example macro with expansion:
 The strings '$#' '#$' '//#' at the beginning of the line act  as comments.
 Those lines are ignored and not prpagated to the output.
 
-The defined macros then referenced by name and a leading / trailing '$%%' sign.
+The defined macros then referenced by name and a leading / trailing '%%' sign.
 
 ### Examples:
 
      $$hello$$ This is a macro. @@hello@@
-
-     The above macro will be substituted here:
+     The above macro will be substituted below:
      %%hello%%
 
 All other text is propagated verbatim.
@@ -53,6 +48,16 @@ Warnings are issued :
  * the macro is not terminated with the same name (except the empty terminator)
  * include file cannot be found.
 
+## Misc:
+
+All the command prefixes / suffixed can be escaped with a backslash to
+loose their special meaning.
+
+The indentation of the macro is preserved. The indentation in the target
+file is determined by the indentation of the expansion, added to the
+indentation of the macro definition.. In short, it will do the
+right thing for python code.
+
   Recursive expansion. Up to six level of recursion is expanded. Make sure that there
 are no self referencing macros like:
 
@@ -60,6 +65,7 @@ are no self referencing macros like:
 
   The recursive macro will print many copies (6) into the output. It is not planned to
 catch recursion any time soon.
+
 
 This is a quick hack, please do not expect much here. However this utility is a
 life saver for coding.
