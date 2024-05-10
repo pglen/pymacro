@@ -1,12 +1,11 @@
 Begin
 $$include$$ macros.txt @@include@@
-% %Hello% %
-$# $$Hello$$ macro re defined here @@Hello@@
-$Hello2$
-%%Hello2%%
-$Hello3$
-%%Hello3%%
-%%Hello4%%
-Hello4 \
-Hello5
+$$code$$ [Embedded] @@code@@
+$$Hello$$
+Hello macro re defined here
+@@Hello@@
+Hello: %%Hello%%
+Hello2: %%Hello2%%
+Hello3: %%Hello3%%
+Hello4: %%Hello4%%
 end \

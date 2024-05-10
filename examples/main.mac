@@ -1,7 +1,14 @@
-$$include$$ main.py @@include@@
+$$include$$ main.inc @@include@@
+$$include$$ allmain.inc @@include@@
 
-$$progname$$  prog="Program Name"
-hello = "hello"
+$$progname$$
+prog="Program Name"
 @@progname@@
-$# Main 1
-%%main%%
+
+$$code$$
+# Adding Code:
+aa = 0
+@@code@@
+%%xprologue%%
+%%xmain%%
+# End

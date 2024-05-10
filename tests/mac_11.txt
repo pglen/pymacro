@@ -1,3 +1,2 @@
-$Hello$ Macro here
-@Hello@
-%Hello%
+$$Hello$$Macro here@@Hello@@
+%%Hello%%

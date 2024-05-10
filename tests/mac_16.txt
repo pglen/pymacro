@@ -1,0 +1,10 @@
+Begin
+$$code$$ [code here] @@ @@
+$$new$$ [new code here]  @@ @@
+$$test$$ Inline -%%code%%- expansion@@test@@
+$$test2$$ Inline -%%new%%- expansion@@test2@@
+$#
+%%test%%
+%%test2%%
+$#
+End

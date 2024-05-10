@@ -1,21 +1,20 @@
 $# Recursive expansion, only macros included
 
-$$Hello$$ Original Macro @@Hello@@
-$$Hello2$$ Second macro  @@Hello2@@
+$$Hello$$
+Hello: Inline -%%code%%- Macro expansion
+@@Hello@@
+
+$$Hello2$$
+Hello2: Multiline macro
+Hello2: Line 2
+@@Hello2@@
+
 $$Hello3$$
-Multiline macro
-Third macro %%Hello2%%
+Hello3: Multiline macro
+Hello3: Line 2
 @@Hello3@@
 
 $$Hello4$$
-This is a macro where another macro is %%Hello3%% embedded.
-@@@Hello4@@
+Hello4: This is a macro with another -%%code%%- macro in it
+@@Hello4@@
 
-$#Hello5$ This is a macro with faulty recursion $Hello5$
-$#
-$#Hello2 second macro redefined
-$#ello_again3  macro3 defined here
-$#
-$# The following is not output n included files
-String from Include: Hello2 Hello3 \
-Hello4 Hello5

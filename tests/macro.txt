@@ -1,0 +1,6 @@
+$# Recursive expansion, only one macro included
+
+$$Hello$$Hello: Inline -%%code%%- Macro expansion
+@@Hello@@
+
+$# EOF

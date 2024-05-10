@@ -1,23 +1,16 @@
+# $$xprologue$$
 #!/usr/bin/env python
-
-# $$full$$
 
 import os, sys, string, argparse
 
 '''
- Macro expansions.
-
+ Header
 '''
+# Globals
 
- # Globals
+@@xprologue@@
 
-seeninc = []
-seenmac = []
-seenbod = []
-
-multi = ""
-multibod = ""
-subnum = 0
+#  $$xfull$$
 
 def emptysplit(strx, delim = " "):
 
@@ -272,26 +265,26 @@ argparser.add_argument( '-i',  '--showinput',
 argparser.add_argument( 'infile')
 argparser.add_argument( 'outfile', nargs='?')
 
-# End of  @@full@@
+# End of  @@xfull@@
 
-# $$main$$
-# Start of program:
+# $$xmain$$# Start of program:
 if __name__ == '__main__':
-    %%progname%%
     global args
     args = argparser.parse_args()
     if args.debug > 5:
         print (args)
     if len(sys.argv) < 2:
-        print("use: $name$ infile")
+        print("use: %%progname%% infile")
         sys.exit(0)
     if args.outfile:
         if args.infile == args.outfile:
             print("Cannot use the same file as in / out")
             sys.exit(1)
-# @@main@@
+    %%code%%
+@@xmain@@
+    # End of macro
 
-# $$main2$$
+# $$xmain2$$
     if args.outfile:
         outfp = open(sys.argv[2], "w")
     else:
@@ -303,8 +296,7 @@ if __name__ == '__main__':
         for aa in range(len(seenmac)):
             print("Macro:", seenmac[aa], " = " , seenbod[aa])
     #print()
-# EOF
-@@main2@@
+# EOF @@xmain2@@
 
 '''
     # Compress vars if come:
@@ -317,7 +309,7 @@ if __name__ == '__main__':
         aa = "".join(States.compr) + "%%"
         States.compr = []
     else:
-        if aa == "%%":
+        if aa == "\%\%":
             act = False
             States.compr.append(aa)
     if act:

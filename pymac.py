@@ -113,9 +113,16 @@ def esplit(strx):
         #print("leftover", cumm)
         arr.append(cumm)
 
-    if args.debug > 6:
+    if args.deb > 8:
         print("esplit", "[{" + strx +"}]", "--", arr);
     return arr
+
+def is_macro(macname):
+
+    for bb in range(len(seenmac)):
+        if seenmac[bb] == macname:
+            return bb
+    return -1
 
 def lookup_macro(macname, indent = 0):
 
@@ -130,12 +137,12 @@ def lookup_macro(macname, indent = 0):
 
         if seenmac[bb] == macname:
             found = True
-            if args.verbose:
-                print("\nexpand_lineing macro:", seenmac[bb],
-                        "bod:", seenbod[bb], "pos:", indent)
+            #if args.verbose:
+            #    print("\nexpand_lineing macro:", seenmac[bb],
+            #            "bod:", seenbod[bb], "pos:", indent)
             cnt = 0
             for aa in seenbod[bb]:
-                if not cnt:
+                if not cnt:         # First line in place
                     sss =  aa
                 else:
                     sss = "\n" + " " * indent + aa
@@ -143,18 +150,17 @@ def lookup_macro(macname, indent = 0):
                 cnt += 1
 
     if not found:
-        print("Warning: Unknown Macro '%s'" % macname,
-                    "file:",  States.fname, "Line:", currline[States.fname],
+        print("Warning: Unknown macro: '%s'" % macname,
+                    "in file:",  States.fname, "Line:", currline[States.fname],
                 file=sys.stderr)
-
-
-    #print("lll2", lll2)
     return lll2
 
 def  expand_line(lll, fff):
 
-    if args.debug > 7:
+    if args.deb > 7:
         print("expand_line", "{" + lll + "'}")
+
+    #print("line:", lll)
 
     States.lineno += 1
     # Short curcuit: Blank line:
@@ -183,7 +189,7 @@ def  expand_line(lll, fff):
 
         elif States.state == STATE_MDEF:
             if aa == "$$":
-                if args.debug > 5:
+                if args.deb > 5:
                     print("Define", States.macx)
                 States.state = STATE_MBOD
                 States.body = []
@@ -195,29 +201,34 @@ def  expand_line(lll, fff):
                 #print("Expand:", States.xname[0])
                 States.state = STATE_INIT
                 macbod = lookup_macro(States.xname[0], expos)
-                if args.debug > 5:
+                if args.deb > 5:
                     print("Expand:", States.xname)
                     print("Macbody:",  macbod)
+
+                if args.verbose > 1:
+                    lll2 += "'''%s'''" % States.xname
+
                 lll2 += macbod
             else:
                 #print("cumm3", States.state.len(), aa)
                 States.xname.append(aa)
 
         elif States.state == STATE_MBOD:
-            # Accumulate body
-            if aa == "@@":
+            if aa == "@@": # or aa == "$$":
                 States.state = STATE_MEND
             else:
+                # Accumulate body
                 States.body.append(aa)
                 States.lines.append(States.lineno)
 
         elif States.state == STATE_MEND:
-            if aa == "@@":
+            if aa == "@@": # or aa == "$$":
 
                 head = "".join(States.macx)
                 #print("Head:", head)
-                #print("Body:", States.body)
-                #print("Lines:", States.lines)
+                if args.deb > 8:
+                    print("Body:", States.body)
+                    print("Lines:", States.lines)
 
                 # Unify lines:
                 uni = {}; body = []
@@ -233,39 +244,61 @@ def  expand_line(lll, fff):
                     body.append(uni[bb])
 
                 #print("Body:", body)
-                if args.debug > 5:
+                if args.deb > 5:
                     print("End def:", States.body)
 
                 # matches current?
-                #if States.macx != States.dname:
-                #    print("Warning: Invalid macro body closure:",
-                #            "file:",  fff,  "Line:", currline[fff],
-                #                    States.dname, file=sys.stderr)
+                #print("Closure mac:", States.macx[0])
+                #print("Closure bod:", States.dname[0])
 
-                if args.debug > 5:
-                    print("macx:", head)
-                    print("body:",  body)
+                # only if there is closure name
+                if len(States.dname) and States.dname[0].strip():
+                    if States.macx[0] != States.dname[0]:
+                        print("Warning: Invalid closure for macro: '%s'" %  States.macx[0],
+                           "in file:",  fff,  "Line:", currline[fff],
+                                     file=sys.stderr)
+                #if args.deb > 5:
+                #    print("macx:", head)
+                #    print("body:",  body)
 
                 if States.macx[0] == "include":
                     #print("SPECIAL: include", "'" + States.body[0].strip() + "'")
-                    States.macx[0] = "" # Kill macro name, prevent recursion
-                    States.state = 0
                     parseincfile(States.body[0].strip(), outfp)
+                    # Restore current file
+                    States.fname = fff
                 else:
                     # Save macro
-                    if args.debug > 7:
+                    if args.deb > 5:
                         print("Save mac:", head)
                         print("Save bod:", body)
-                    seenmac.append(head)
-                    seenbod.append(body)
-                States.body = []
-                States.lines = []
-                States.dname = []
-                States.state = 0
+                    rrr = is_macro(head)
+                    if rrr >= 0 :
+                        print("Warning: duplicate macro: '%s'" % head,
+                            "in file:",  States.fname, "Line:", currline[States.fname],
+                        file=sys.stdout)
+                        seenmac[rrr] = head
+                        seenbod[rrr] = body
+                    else:
+                        seenmac.append(head)
+                        seenbod.append(body)
+
+                # Was this an abrupt termination?
+                if aa == "$$":
+                    # start new macro
+                    #print("New macro in body define", States.macx)
+                    #States.state = STATE_MDEF
+                    #States.macx = []
+                    pass
+                else:
+                    # Reset state
+                    States.body = []
+                    States.lines = []
+                    States.dname = []
+                    States.state = 0
             else:
                 States.dname.append(aa)
         else:
-            if 1: #args.debug > 0:
+            if 1: #args.deb > 0:
                 print("Invalid state", States.state)
             pass
 
@@ -280,27 +313,60 @@ def  expand_line(lll, fff):
 
 def parseincfile(macfile, outfp):
 
-    #print("parseincfile()", macfile)
+    # Reset parser
+    States.macx[0] = "" # Kill macro name, prevent recursion
+    States.state = 0
+    States.macx = []
+    States.body = []
+    States.dname = []
+    States.lines = []
 
     # Scan possible locations
 
     # 1.) dir of the source file
     ppp = os.path.dirname(args.infile)
     fff = os.path.join(ppp, macfile)
-    #print("fff", fff)
+    #print("try: fff", fff)
     if os.path.isfile(fff):
         seeninc.append(fff)
+        if args.verbose:
+            print("Including:  '%s'" % fff)
         parsefile(fff, outfp, True)
+
         return True
 
     # 2.) current dir
     if os.path.isfile(macfile):
         seeninc.append(macfile)
+        if args.verbose:
+            print("Including:  '%s'" % macfile)
         parsefile(macfile, outfp, True)
         return True
 
-    print("Warning: Could not open include file '%s'" % macfile, file=sys.stdout)
+    # 3.) user macro dir
+    ppp = os.path.dirname(os.path.expanduser("~/pymacros/"))
+    fff = os.path.join(ppp, macfile)
+    #print("try: fff", fff)
+    if os.path.isfile(fff):
+        seeninc.append(fff)
+        if args.verbose:
+            print("Including:  '%s'" % fff)
+        parsefile(fff, outfp, True)
+        return True
+
+    print("Warning: Could not open include: '%s'" % macfile,
+                    "in file:",  States.fname, "Line:", currline[States.fname],
+                    file=sys.stdout)
     return False
+
+def add_line(zstr, xstr):
+
+    if zstr != None:
+        padd = ""
+        if xstr:
+            padd = "\n"
+        xstr += padd + zstr
+    return xstr
 
 def parsefile(nnn, outfp, inc=False):
 
@@ -310,9 +376,8 @@ def parsefile(nnn, outfp, inc=False):
     States.fname = nnn
     #print ("Parsing", nnn)
 
-    xstr = ""
     fpi = open(nnn, "r")
-    addnext = "";
+    xstr = "";  addnext = "";
     for aaa in fpi:
         try:
             currline[nnn] += 1
@@ -322,7 +387,7 @@ def parsefile(nnn, outfp, inc=False):
         bbb = str.replace(aaa, "\n", "")
 
         if currline[nnn] <= args.skip and inc==False:
-            if args.verbose:
+            if args.deb > 3:
                 print("Skipping:", nnn, currline[nnn], bbb)
             continue
 
@@ -354,28 +419,17 @@ def parsefile(nnn, outfp, inc=False):
             #print("zstr:", zstr)
             if args.showinput:
                 print("Output: [", zstr, "]")
-            if zstr != None:
-                if xstr:
-                    xstr += "\n"
-                xstr += zstr
+            xstr = add_line(zstr, xstr)
 
     # Left over without line continuation
     if addnext != "":
         #print("Continuation", addnext)
         zstr = expand_line (addnext, nnn)
-        if zstr != None:
-            if xstr:
-                xstr += "\n"
-            xstr += zstr
+        xstr = add_line(zstr, xstr)
 
     # Loop until all items are expand_lineed
 
     cnt = 0  # Thinking 6 deep is enough
-
-    # No text on macro files
-
-    if inc:
-        return
 
     if xstr != None:
         cnt = 0
@@ -386,10 +440,9 @@ def parsefile(nnn, outfp, inc=False):
             xstr2 = xstr.split("\n")
             xstr3 = ""
             for aa in xstr2:
-                xstr4 = expand_line (aa, nnn)
-                if xstr4:
-                    xstr3 += xstr4 + "\n"
-
+                zstr = expand_line(aa, nnn)
+                #print("zstr", "'" + zstr + "'")
+                xstr3 = add_line(zstr, xstr3)
             if xstr3 == None:
                 break
             xstr = xstr3
@@ -399,31 +452,45 @@ def parsefile(nnn, outfp, inc=False):
             if cnt > 6:
                 break
 
+        # No text on macro files
+
+        if inc:
+            return
+
         #print ("xstr", xstr);
         if xstr:
             print("%s" % xstr, file=outfp)
 
-argparser = argparse.ArgumentParser(description='Macro processor')
+desc = '''\
+Will expand macros. A macro is defined with a '$$' enclosed sting. (Like: $$macro$$)
+The macro body is defined after that, terminated by a '@@' enclosed string. (like: @@macro@@)
+The macro is expanded by a '%%' enclosed string. (like: %%macro%%). Here is a
+complete macro with expansion. $$mac$$ Hello @@mac@@ %%mac%%.
+Include search path: the path of the source file, current directory then
+the global macro path. (~/pymacros).
+The strings '$#' '#$' '//#' at the beginning of the line act as comments.
+'''
+argparser = argparse.ArgumentParser(description=desc)
 
 argparser.add_argument( '-v',  '--verbose',
-    action="store_true",
-    help='show operational details')
+    action="count",
+    help='Show operational details. -vv more for output')
 
-argparser.add_argument( '-d',  '--debug',
+argparser.add_argument( '-d',  '--deb',
     action="store", type=int, default=0,
-    help='debug level')
+    help='Debug level (0=none 10=Noisy)')
 
 argparser.add_argument( '-s',  '--skip',
     action="store", type=int, default=0,
-    help='Skip initial lines')
+    help='Skip number of initial lines')
 
 argparser.add_argument( '-i',  '--showinput',
     action="store_true",
-    help='show input fileo')
+    help='Show input lines from file ')
 
 argparser.add_argument( '-n',  '--norecurse',
     action="store_true",
-    help='Do not recurse into setings')
+    help='Do not recurse. Flat expansion.')
 
 argparser.add_argument( 'infile')
 argparser.add_argument( 'outfile', nargs='?')
@@ -437,12 +504,8 @@ if __name__ == '__main__':
     global args
 
     args = argparser.parse_args()
-    if args.debug > 5:
+    if args.deb > 9:
         print (args)
-
-    if len(sys.argv) < 2:
-        print("use: pymac.py infile")
-        sys.exit(0)
 
     if args.outfile:
         if args.infile == args.outfile:
@@ -450,14 +513,21 @@ if __name__ == '__main__':
             sys.exit(1)
 
     if args.outfile:
-        outfp = open(sys.argv[2], "w")
+        outfp = open(args.outfile, "w")
     else:
         outfp = sys.stdout
+
+    if args.verbose:
+        print("Processing: '%s'" % args.infile)
+
+    if not os.path.isfile(args.infile):
+        print("Cannot open: '%s'"  % args.infile)
+        sys.exit(0)
 
     parsefile(args.infile, outfp)
 
     # Diagnostics: print macros
-    if args.debug > 4:
+    if args.deb > 4:
         print("Dumping macros:")
         for aa in range(len(seenmac)):
             print("Macro:", seenmac[aa], " = " , seenbod[aa])

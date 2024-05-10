@@ -1,10 +1,9 @@
-$# Multi line macro
+$# Multi line recursive macro
 Begin
 $$Hello2$$
 'hello2 macro'
 'hello2 Second line'
 @@Hello2@@
-
 $$Hello$$
     hello macro
     hello line 2 recursive %%Hello2%% test

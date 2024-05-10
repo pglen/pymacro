@@ -1,11 +1,13 @@
 $# Macro comment
 Begin
-$$Hello2$$Act@@Hello2@@
+$$act$$Act@@act@@
 $$Hello$$
     multiline macro defined here
     line 2 of multi line
-    line 3 of multi line %%Hello2%% again
+    line 3 of multi line %%act%% again
     line 4
 @@Hello@@
-        %%Hello%%
+This is macro '%%act%%'
+
+Multiline:  %%Hello%%
 End

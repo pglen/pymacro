@@ -1,4 +1,15 @@
+$# Warnings and errors
 Begin
-$$org$$ "Original Macro" @@ @@
+$$include$$nofile@@ @@
+$$org$$ "Original Macro" @@org@@
+
+$$closure$$
+Bad Closure
+Bad Closure
+Bad Closure
+Bad Closure
+@@closure@@
+
 This is a text with a  %%org%% embedded here.
+%%nomacro%%
 End

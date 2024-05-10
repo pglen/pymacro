@@ -1,5 +1,7 @@
 Begin
-$$org$$ "Original Macro" @@org@@
-$$mult$$ "Multiline macro with another %%org%% on single line" @@ @@
+$$org$$'Embedded Macro'@@ @@
+$$org2$$"Original Macro with %%org%% with no spaces"@@org2@@
+$$mult$$Embedded %%org2%% here @@mult@@
 %%mult%%
+$#%%badmac%%
 End

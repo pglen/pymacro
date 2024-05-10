@@ -1,0 +1,4 @@
+Begin
+$$Hello5$$ This is a macro with faulty %%Hello5%% recursion @@Hello5@@
+%%Hello5%%
+End

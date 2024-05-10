@@ -1,9 +1,11 @@
 $# No spaces required
 Begin
-$$org$$"Original_Name"@@ @@
+$$org$$"Original_Name"@@org@@
 $$name$$
-"Full macro embedded in another %%org%% on single line"
+"Full  macro embedded in another %%org%% on single line"
 "Full2 macro embedded in another %%org%% on single line"
-@@ @@
+@@name@@
 %%name%%
+Indented:
+    %%name%%
 End

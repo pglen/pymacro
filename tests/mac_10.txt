@@ -1,9 +1,9 @@
 Begin
-$name "Name"
-$!mult
-    "Multiline $name$ "
+$$name$$ "Name" @@name@@
+$$multi$$
+    "Multiline %%name%%"
     Again
-$!mult
-    $!mult$
-        $!mult$
+@@multi@@
+Indented by 8
+    %%multi%%
 End

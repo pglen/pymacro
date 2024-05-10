@@ -1,0 +1,7 @@
+Begin
+$$include$$ macro.txt @@include@@
+$$code$$ [code here] @@code@@
+%%Hello%%
+$$test$$Inline -%%code%%- expansion@@test@@
+%%test%%
+End
