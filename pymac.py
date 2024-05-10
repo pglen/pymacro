@@ -474,7 +474,7 @@ argparser = argparse.ArgumentParser(description=desc)
 
 argparser.add_argument( '-v',  '--verbose',
     action="count", default=0,
-    help='Show operational details. -vv more for output')
+    help='Show operational details. -vv for more output')
 
 argparser.add_argument( '-d',  '--deb',
     action="store", type=int, default=0,

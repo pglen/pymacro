@@ -4,7 +4,7 @@
 
     usage: pymac.py [-h] [-v] [-d DEB] [-s SKIP] [-i] [-n] infile [outfile]
 
- Will expand macros into outfile or stdout
+Will expand macros into outfile or stdout
 
 A macro is defined with a '\$\$' enclosed sting.
 
@@ -35,7 +35,7 @@ Will print the infamous message string.
 
     options:
       -h, --help            show this help message and exit
-      -v, --verbose         Show operational details. -vv more for output
+      -v, --verbose         Show operational details. -vv for more output
       -d DEB, --deb DEB     Debug level (0=none 10=Noisy)
       -s SKIP, --skip SKIP  Skip number of initial lines
       -i, --showinput       Show input lines from file
@@ -47,16 +47,7 @@ into the target as it is expanded. For troubleshooting only.
 Skip lines will ignore the number of leading lines, for instance the #!/usr/bin ..
 may be skipped with this option.
 
-## Include search path:
-
- * Path of the source file,
- * Current directory
- * User's macro path. (~/pymacros).
-
-## Macro Comments:
-
-The strings '$#' '#$' '//#' at the beginning of the line act  as comments.
-Those lines are ignored and not prpagated to the output.
+## Macro expansion
 
 The defined macros then referenced by name and a leading / trailing '%%' sign.
 
@@ -66,10 +57,30 @@ The defined macros then referenced by name and a leading / trailing '%%' sign.
      The above macro will be substituted below:
      %%hello%%
 
-All other text is propagated verbatim.
+All other text, except macro comments are propagated verbatim.
 
- The special macro / command \$\$include\$\$ will read a macro file into the current
-context.
+## Macro Comments:
+
+The strings '$#' '#$' '//#' at the beginning of the line denote comments.
+Those lines are completely ignored and not propagated to the output.
+
+## Include macro files:
+
+The special macro / command will read a macro file into the current context.
+
+    $$include$$
+
+The include files do not contribute directly to the output, they define macros
+for the main file to expand. This is to allow raw files to be annotated without
+generating clutter.
+
+The Include search path:
+
+ * Path of the source file,
+ * Current directory
+ * User's macro path. (~/pymacros).
+
+## Misc:
 
 Warnings are issued :
 
@@ -77,8 +88,6 @@ Warnings are issued :
  * the macro had duplicate definition,
  * the macro is not terminated with the same name (except the empty terminator)
  * include file cannot be found.
-
-## Misc:
 
 All the command prefixes / suffixed can be escaped with a backslash to
 loose their special meaning.
@@ -95,7 +104,6 @@ are no self referencing macros like:
 
   The recursive macro will print many copies (6) into the output. It is not planned to
 catch recursion any time soon.
-
 
 This is a quick hack, please do not expect much here. However this utility is a
 life saver for coding.
