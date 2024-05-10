@@ -6,16 +6,21 @@
 
  Will expand macros into outfile or stdout
 
-A macro is defined with a '\$\$' enclosed sting. (like: \$\$name\$\$)
-The macro body is defined after that, terminated by a '@@' enclosed
-string. (like: @name@@) The empty terminator '@@ @@' can be used as a convenience;
+A macro is defined with a '\$\$' enclosed sting.
+    $$macro_name$$
+The macro body is defined after that, terminated by a '@@' enclosed string.
+    @$macro_name@@
+ The empty terminator '@@ @@' can be used as a convenience;
 
-The macro is expanded by a '%%' enclosed string. (like: %%macro%%).
+The macro is expanded by a '%%' enclosed string.
+     %%macro_name%%
 
 Here is a complete example macro with expansion:
 
-    $$mac$$ Hello @@mac@@
+    $$mac$$ Hello World@@mac@@
     %%mac%%.
+
+Will print the infamous message string.
 
 ## Include search path:
 
@@ -112,4 +117,4 @@ Will create the following code: (from main.inc):
 
  Peter Glen
 
-# EOF
+// EOF
