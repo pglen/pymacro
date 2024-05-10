@@ -2,7 +2,7 @@
 
 clean:
 	@echo "Clean"
-	rm -r __pycache__
+	rm -rf __pycache__
 	rm -f aa bb cc
 
 test:

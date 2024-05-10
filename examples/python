@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+import os, sys, string, argparse
+'''
+ Header
+'''
+# Globals
+# Start of program:
+if __name__ == '__main__':
+    global args
+    args = argparser.parse_args()
+    if args.debug > 5:
+        print (args)
+    if len(sys.argv) < 2:
+        print("use:  prog="Program Name" infile")
+        sys.exit(0)
+    if args.outfile:
+        if args.infile == args.outfile:
+            print("Cannot use the same file as in / out")
+            sys.exit(1)
+    # Adding Code:
+    aa = 0

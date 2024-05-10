@@ -1,13 +1,11 @@
 # $$xprologue$$
 #!/usr/bin/env python
-
 import os, sys, string, argparse
 
 '''
- Header
+ Header. This is now an example macro source include.
 '''
 # Globals
-
 @@xprologue@@
 
 #  $$xfull$$
@@ -247,7 +245,9 @@ def parsefile(nnn, outfp):
         #print ("xstr", xstr);
         if xstr:
             print("%s" % xstr, file=outfp)
+# End of  @@xfull@@
 
+$$xparser$$
 argparser = argparse.ArgumentParser(description='Macro processor')
 
 argparser.add_argument( '-v',  '--verbose',
@@ -265,38 +265,9 @@ argparser.add_argument( '-i',  '--showinput',
 argparser.add_argument( 'infile')
 argparser.add_argument( 'outfile', nargs='?')
 
-# End of  @@xfull@@
+@@xparser@@
 
-# $$xmain$$# Start of program:
-if __name__ == '__main__':
-    global args
-    args = argparser.parse_args()
-    if args.debug > 5:
-        print (args)
-    if len(sys.argv) < 2:
-        print("use: %%progname%% infile")
-        sys.exit(0)
-    if args.outfile:
-        if args.infile == args.outfile:
-            print("Cannot use the same file as in / out")
-            sys.exit(1)
-    %%code%%
-@@xmain@@
-    # End of macro
-
-# $$xmain2$$
-    if args.outfile:
-        outfp = open(sys.argv[2], "w")
-    else:
-        outfp = sys.stdout
-    parsefile(args.infile, outfp)
-    # Diagnostics: print macros
-    if args.debug > 4:
-        print("Dumping macros:")
-        for aa in range(len(seenmac)):
-            print("Macro:", seenmac[aa], " = " , seenbod[aa])
-    #print()
-# EOF @@xmain2@@
+$$compress$$
 
 '''
     # Compress vars if come:
@@ -316,3 +287,36 @@ if __name__ == '__main__':
         #print("add to body:", "'" + aa + "'")
 '''
 
+@@compress@@
+
+
+# $$xmain$$# Start of program:
+if __name__ == '__main__':
+    global args
+    args = argparser.parse_args()
+    if args.debug > 5:
+        print (args)
+    if len(sys.argv) < 2:
+        print("use: %%progname%% infile")
+        sys.exit(0)
+    if args.outfile:
+        if args.infile == args.outfile:
+            print("Cannot use the same file as in / out")
+            sys.exit(1)
+    %%code%%
+@@xmain@@
+    # End of macro
+
+# $$xepilog$$
+    if args.outfile:
+        outfp = open(sys.argv[2], "w")
+    else:
+        outfp = sys.stdout
+    parsefile(args.infile, outfp)
+    # Diagnostics: print macros
+    if args.debug > 4:
+        print("Dumping macros:")
+        for aa in range(len(seenmac)):
+            print("Macro:", seenmac[aa], " = " , seenbod[aa])
+    #print()
+# EOF @@xepilog@@

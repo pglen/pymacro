@@ -43,14 +43,13 @@ Will print the infamous message string.
       -i, --showinput       Show input lines from file
       -n, --norecurse       Do not recurse. Flat expansion.
 
-Verbose prints file name as it is processed, double verbose injects the macro name
+Verbose prints the file name as it is processed, double verbose injects the macro name
 into the target as it is expanded. For troubleshooting only.
 
 Debug outputs parsing information. Lot of info ... for advanced users or troubleshooting.
 
 Skip lines will ignore the number of leading lines, for instance the #!/usr/bin ..
-may be skipped with this option.
-
+may be skipped with this option, if desired.
 
 ## Macro expansion
 
@@ -65,7 +64,9 @@ The defined macros then referenced by name and a leading / trailing '%%' sign.
 ## Macro Comments:
 
 The strings '$#' '#$' '//#' at the beginning of the line denote comments.
-Those lines are completely ignored and not propagated to the output.
+Those lines are completely ignored and not propagated to the output. Notice
+that macros can be written in the comment section of the source file; it
+is possble to mix live code and macro content.
 
 ## Include macro files:
 
@@ -82,6 +83,19 @@ The Include search path:
  * Path of the source file,
  * Current directory,
  * User's macro path (~/pymacros).
+
+The ~/pymacros  directory can host a code collection, independent of the
+original source contennt. As an idea starter, the main function templete,
+the header section, the command line intepreter section could all be
+macros in your code. Then, your code could look like:
+
+    %%pre%%
+    %comline%%
+    %%main%%
+    %post%%
+
+This hides the dirty details, and makes the code clean and fresh.
+One could also include live code ... as it is copied verbatim to the output.
 
 ## Misc:
 
@@ -117,6 +131,13 @@ whitespce within space is preserved.
 
 This program is a quick conjure, please do not expect much here. However this utility is a
 life saver for coding.
+
+### Makefile inference rule: (pattern rule)
+
+    %.py : %.mac
+        pyvmac.py  $< $@
+
+This generates PY source files from macro files.
 
 ## Example usage:
 
