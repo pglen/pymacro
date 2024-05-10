@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# $!full
+# $$full$$
 
 import os, sys, string, argparse
 
@@ -24,9 +24,9 @@ def emptysplit(strx, delim = " "):
     ''' Split str on single delimiter '''
 
     arr = []; cumm = ""
-    for aa in range(len(strx)):
+    for aaa in range(len(strx)):
         cumm += strx[aa];
-        if strx[aa] == delim:
+        if strx[aaa] == delim:
             arr.append(cumm)
             cumm = ""
 
@@ -198,7 +198,7 @@ def parsefile(nnn, outfp):
         bbb = str.replace(aaa, "\n", "")
 
         # Comment
-        if str.strip(bbb)[:2] == "$$":
+        if str.strip(bbb)[:2] == "\$\$":
             #print("Comment", bbb)
             continue
 
@@ -272,15 +272,12 @@ argparser.add_argument( '-i',  '--showinput',
 argparser.add_argument( 'infile')
 argparser.add_argument( 'outfile', nargs='?')
 
-# End of  $!full
+# End of  @@full@@
 
-# $!main
+# $$main$$
 # Start of program:
-
 if __name__ == '__main__':
-
-$!progname$
-
+    %%progname%%
     global args
     args = argparser.parse_args()
     if args.debug > 5:
@@ -292,9 +289,9 @@ $!progname$
         if args.infile == args.outfile:
             print("Cannot use the same file as in / out")
             sys.exit(1)
-    # $!main
+# @@main@@
 
-    # $!main2
+# $$main2$$
     if args.outfile:
         outfp = open(sys.argv[2], "w")
     else:
@@ -305,10 +302,25 @@ $!progname$
         print("Dumping macros:")
         for aa in range(len(seenmac)):
             print("Macro:", seenmac[aa], " = " , seenbod[aa])
-
-    # $!main2
-
     #print()
-
 # EOF
+@@main2@@
+
+'''
+    # Compress vars if come:
+    #print("Incoming", len(States.compr), "'" + aa + "'")
+    act = True
+    if len(States.compr) == 1:
+        act = False
+        States.compr.append(aa)
+    elif len(States.compr) == 2:
+        aa = "".join(States.compr) + "%%"
+        States.compr = []
+    else:
+        if aa == "%%":
+            act = False
+            States.compr.append(aa)
+    if act:
+        #print("add to body:", "'" + aa + "'")
+'''
 

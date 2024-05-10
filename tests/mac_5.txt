@@ -1,12 +1,17 @@
 $# Multi line macro
 Begin
-$$Hello2$$'hello2 macro'@@Hello2@@
-$$Hello$$ 'hello macro'
-    multi line 1
-    multiline 2 recursive %%Hello2%% test
-    multi line 3 line cont \
+$$Hello2$$
+'hello2 macro'
+'hello2 Second line'
+@@Hello2@@
+
+$$Hello$$
+    hello macro
+    hello line 2 recursive %%Hello2%% test
+    hello line 3 line cont
     End multi
 @@Hello@@
 after multi def
 %%Hello%%
+after multi exp
 End

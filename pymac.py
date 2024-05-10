@@ -25,24 +25,6 @@ has unique markers for each function.
 
 '''
 
-'''
-    # Compress vars if come:
-    #print("Incoming", len(States.compr), "'" + aa + "'")
-    act = True
-    if len(States.compr) == 1:
-        act = False
-        States.compr.append(aa)
-    elif len(States.compr) == 2:
-        aa = "".join(States.compr) + "%%"
-        States.compr = []
-    else:
-        if aa == "%%":
-            act = False
-            States.compr.append(aa)
-    if act:
-        #print("add to body:", "'" + aa + "'")
-'''
-
  # Globals
 
 STATE_INIT  = 0
@@ -135,9 +117,9 @@ def esplit(strx):
         print("esplit", "[{" + strx +"}]", "--", arr);
     return arr
 
-def lookup_macro(macname, pos = 0):
+def lookup_macro(macname, indent = 0):
 
-    #print("lookup_macro()", macname, pos)
+    #print("lookup_macro()", macname, indent)
 
     lll2 = ""
     found = 0
@@ -150,15 +132,13 @@ def lookup_macro(macname, pos = 0):
             found = True
             if args.verbose:
                 print("\nexpand_lineing macro:", seenmac[bb],
-                        "bod:", seenbod[bb], "pos:", pos)
+                        "bod:", seenbod[bb], "pos:", indent)
             cnt = 0
             for aa in seenbod[bb]:
-                #print("lookit:", aa)
                 if not cnt:
-                    sss = " " * pos + aa
+                    sss =  aa
                 else:
-                    sss = "\n" + " " * pos + aa
-                #sss = " " * pos + aa + "\n"
+                    sss = "\n" + " " * indent + aa
                 lll2 += sss
                 cnt += 1
 
@@ -199,7 +179,6 @@ def  expand_line(lll, fff):
                 expos = pos
             else:
                 # If nothing goes on, add it to the output
-                #if States.state == STATE_INIT :
                 lll2 += aa
 
         elif States.state == STATE_MDEF:
@@ -215,7 +194,7 @@ def  expand_line(lll, fff):
             if aa == "%%":
                 #print("Expand:", States.xname[0])
                 States.state = STATE_INIT
-                macbod = lookup_macro(States.xname[0], 0) #expos)
+                macbod = lookup_macro(States.xname[0], expos)
                 if args.debug > 5:
                     print("Expand:", States.xname)
                     print("Macbody:",  macbod)
@@ -268,9 +247,7 @@ def  expand_line(lll, fff):
                     print("body:",  body)
 
                 if States.macx[0] == "include":
-                    print("SPECIAL: include", "'" + States.body[0].strip() + "'")
-                    #print("include", States.macx)
-                    #print("include", States.body)
+                    #print("SPECIAL: include", "'" + States.body[0].strip() + "'")
                     States.macx[0] = "" # Kill macro name, prevent recursion
                     States.state = 0
                     parseincfile(States.body[0].strip(), outfp)
@@ -293,6 +270,7 @@ def  expand_line(lll, fff):
             pass
 
         pos += len(aa)
+        #print("pos:", pos, "aa:", aa)
         cnt += 1
 
     if lll2 == "":
@@ -302,7 +280,7 @@ def  expand_line(lll, fff):
 
 def parseincfile(macfile, outfp):
 
-    print("parseincfile()", macfile)
+    #print("parseincfile()", macfile)
 
     # Scan possible locations
 
@@ -405,8 +383,13 @@ def parsefile(nnn, outfp, inc=False):
             if args.norecurse:
                 break
             cnt += 1
-            xstr2 = xstr[:]
-            xstr3 =  expand_line (xstr2, nnn)
+            xstr2 = xstr.split("\n")
+            xstr3 = ""
+            for aa in xstr2:
+                xstr4 = expand_line (aa, nnn)
+                if xstr4:
+                    xstr3 += xstr4 + "\n"
+
             if xstr3 == None:
                 break
             xstr = xstr3
