@@ -1,2 +1,0 @@
-Warning: Invalid closure for macro: 'mult' in file: tests/mac_8.txt Line: 4
-Warning: Unknown macro 'badmac' in file: tests/mac_8.txt Line: 5

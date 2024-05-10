@@ -1,4 +1,4 @@
-# PyMacro
+# PyvMacro
 
 ## This is a simple macro processor.
 
@@ -82,7 +82,7 @@ The Include search path:
 
 ## Misc:
 
-PyMacro is case senstive.
+PyvMacro is case senstive.
 
 All the commands prefixes / suffixes can be escaped with a backslash to
 loose their special meaning.
